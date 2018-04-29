@@ -234,14 +234,14 @@ else:
 # Modify the job name if you want.
 job_name = "SSD_{}".format(resize)
 # The name of the model. Modify it if you want.
-model_name = "VGG_VOC0712_{}".format(job_name)
+model_name = "Resnet18_VOC0712_{}".format(job_name)
 
 # Directory which stores the model .prototxt file.
-save_dir = "models/VGGNet/VOC0712/{}".format(job_name)
+save_dir = "models/Resnet18/VOC0712/{}".format(job_name)
 # Directory which stores the snapshot of models.
-snapshot_dir = "models/VGGNet/VOC0712/{}".format(job_name)
+snapshot_dir = "models/Resnet18/VOC0712/{}".format(job_name)
 # Directory which stores the job script and log file.
-job_dir = "jobs/VGGNet/VOC0712/{}".format(job_name)
+job_dir = "jobs/Resnet18/VOC0712/{}".format(job_name)
 # Directory which stores the detection results.
 output_result_dir = "{}/data/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)
 
@@ -258,7 +258,7 @@ job_file = "{}/{}.sh".format(job_dir, model_name)
 # Stores the test image names and sizes. Created by data/VOC0712/create_list.sh
 name_size_file = "data/VOC0712/test_name_size.txt"
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
-pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
+pretrain_model = "models/Resnet/resnet-18.caffemodel"
 # Stores LabelMapItem.
 label_map_file = "data/VOC0712/labelmap_voc.prototxt"
 
@@ -297,13 +297,13 @@ loss_param = {
 # parameters for generating priors.
 # minimum dimension of input image
 min_dim = 300
-# conv4_3 ==> 38 x 38
+# res3a ==> 38 x 38
 # fc7 ==> 19 x 19
 # conv6_2 ==> 10 x 10
 # conv7_2 ==> 5 x 5
 # conv8_2 ==> 3 x 3
 # conv9_2 ==> 1 x 1
-mbox_source_layers = ['conv4_3', 'fc7', 'conv6_2', 'conv7_2', 'conv8_2', 'conv9_2']
+mbox_source_layers = ['res3a', 'fc7', 'conv6_2', 'conv7_2', 'conv8_2', 'conv9_2']
 # in percent %
 min_ratio = 20
 max_ratio = 90
@@ -329,7 +329,7 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-gpus = "0,1,2,3"
+gpus = "0,1,2"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
