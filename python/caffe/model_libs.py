@@ -953,6 +953,6 @@ def ResNet18Body(net, from_layer, use_pool5=True, use_dilation_conv5=False, **bn
     ResBody(net, 'res2c', '3a', out2a=128, out2b=128, out2c=512, stride=2, use_branch1=True, **bn_param)
     ResBody(net, 'res3a', '3b', out2a=128, out2b=128, out2c=512, stride=2, use_branch1=True, **bn_param)
 
-    net.pool3 = L.Pooling(net.res3a, pool=P.Pooling.MAX, kernel_size=2, stride=2)
+    net.pool3 = L.Pooling(net.res3b, pool=P.Pooling.MAX, kernel_size=2, stride=2)
 
     return net
