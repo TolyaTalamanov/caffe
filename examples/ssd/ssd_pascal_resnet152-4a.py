@@ -432,7 +432,7 @@ net.data, net.label = CreateAnnotatedDataLayer(train_data, batch_size=batch_size
         train=True, output_label=True, label_map_file=label_map_file,
         transform_param=train_transform_param, batch_sampler=batch_sampler)
 
-Resnet152_4a(net, from_layer='data', fully_conv=True, reduced=True, dilated=True,
+ResNet152_4a(net, from_layer='data', fully_conv=True, reduced=True, dilated=True,
     dropout=False)
 
 AddExtraLayers(net, use_batchnorm, lr_mult=lr_mult)
@@ -461,7 +461,7 @@ net.data, net.label = CreateAnnotatedDataLayer(test_data, batch_size=test_batch_
         train=False, output_label=True, label_map_file=label_map_file,
         transform_param=test_transform_param)
 
-Resnet152_4a(net, from_layer='data', fully_conv=True, reduced=True, dilated=True,
+ResNet152_4a(net, from_layer='data', fully_conv=True, reduced=True, dilated=True,
     dropout=False)
 
 AddExtraLayers(net, use_batchnorm, lr_mult=lr_mult)
