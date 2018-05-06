@@ -237,11 +237,11 @@ job_name = "SSD_{}".format(resize)
 model_name = "Resnet1524a_VOC0712_{}".format(job_name)
 
 # Directory which stores the model .prototxt file.
-save_dir = "models/Resnet152-4a/VOC0712/{}".format(job_name)
+save_dir = "models/Resnet152_4a/VOC0712/{}".format(job_name)
 # Directory which stores the snapshot of models.
-snapshot_dir = "models/Resnet152-4a/VOC0712/{}".format(job_name)
+snapshot_dir = "models/Resnet152_4a/VOC0712/{}".format(job_name)
 # Directory which stores the job script and log file.
-job_dir = "jobs/Resnet152-4a/VOC0712/{}".format(job_name)
+job_dir = "jobs/Resnet152_4a/VOC0712/{}".format(job_name)
 # Directory which stores the detection results.
 output_result_dir = "{}/data/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)
 
