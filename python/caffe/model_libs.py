@@ -932,7 +932,7 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
 
     return mbox_layers
 
-def ResNet152Body(net, from_layer, **bn_param):
+def ResNet152_4a(net, from_layer, **bn_param):
     conv_prefix = ''
     conv_postfix = ''
     bn_prefix = 'bn_'
