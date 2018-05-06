@@ -234,14 +234,14 @@ else:
 # Modify the job name if you want.
 job_name = "SSD_{}".format(resize)
 # The name of the model. Modify it if you want.
-model_name = "Resnet152-4a_VOC0712_{}".format(job_name)
+model_name = "Resnet1524a_VOC0712_{}".format(job_name)
 
 # Directory which stores the model .prototxt file.
-save_dir = "models/Resnet-152-4a/VOC0712/{}".format(job_name)
+save_dir = "models/Resnet152-4a/VOC0712/{}".format(job_name)
 # Directory which stores the snapshot of models.
-snapshot_dir = "models/Resnet-152-4a/VOC0712/{}".format(job_name)
+snapshot_dir = "models/Resnet152-4a/VOC0712/{}".format(job_name)
 # Directory which stores the job script and log file.
-job_dir = "jobs/Resnet-152-4a/VOC0712/{}".format(job_name)
+job_dir = "jobs/Resnet152-4a/VOC0712/{}".format(job_name)
 # Directory which stores the detection results.
 output_result_dir = "{}/data/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)
 
@@ -258,7 +258,7 @@ job_file = "{}/{}.sh".format(job_dir, model_name)
 # Stores the test image names and sizes. Created by data/VOC0712/create_list.sh
 name_size_file = "data/VOC0712/test_name_size.txt"
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
-pretrain_model = "models/Resnet-152-model-caffemodel"
+pretrain_model = "models/Resnet152_4a/ResNet-152-model.caffemodel"
 # Stores LabelMapItem.
 label_map_file = "data/VOC0712/labelmap_voc.prototxt"
 
@@ -329,12 +329,12 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-gpus = "0,1,2"
+gpus = "0,1"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
 # Divide the mini-batch to different GPUs.
-batch_size = 32
+batch_size = 16
 accum_batch_size = 32
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
