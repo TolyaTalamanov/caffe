@@ -931,3 +931,34 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
         mbox_layers.append(net[name])
 
     return mbox_layers
+
+def ResNet152_4a(net, from_layer, **bn_param):
+    conv_prefix = ''
+    conv_postfix = ''
+    bn_prefix = 'bn_'
+    bn_postfix = ''
+    scale_prefix = 'scale_'
+    scale_postfix = ''
+    ConvBNLayer(net, from_layer, 'conv1', use_bn=True, use_relu=True,
+        num_output=64, kernel_size=7, pad=3, stride=2,
+        conv_prefix=conv_prefix, conv_postfix=conv_postfix,
+        bn_prefix=bn_prefix, bn_postfix=bn_postfix,
+        scale_prefix=scale_prefix, scale_postfix=scale_postfix, **bn_param)
+
+    net.pool1 = L.Pooling(net.conv1, pool=P.Pooling.MAX, kernel_size=3, stride=2)
+
+    ResBody(net, 'pool1', '2a', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=True, **bn_param)
+    ResBody(net, 'res2a', '2b', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=False, **bn_param)
+    ResBody(net, 'res2b', '2c', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=False, **bn_param)
+
+    ResBody(net, 'res2c', '3a', out2a=128, out2b=128, out2c=512, stride=2, use_branch1=True, **bn_param)
+
+    from_layer = 'res3a'
+    for i in xrange(1, 8):
+      block_name = '3b{}'.format(i)
+      ResBody(net, from_layer, block_name, out2a=128, out2b=128, out2c=512, stride=1, use_branch1=False, **bn_param)
+      from_layer = 'res{}'.format(block_name)
+
+    ResBody(net, from_layer, '4a', out2a=256, out2b=256, out2c=1024, stride=2, use_branch1=True, **bn_param)
+
+    return net
