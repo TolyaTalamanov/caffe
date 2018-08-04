@@ -35,9 +35,10 @@ def get_labelname(labelmap, labels):
     return labelnames
 
 class CaffeDetection:
-    def __init__(self, gpu_id, model_def, model_weights, image_resize, labelmap_file):
-        caffe.set_device(gpu_id)
-        caffe.set_mode_gpu()
+    def __init__(self, cpu_only, gpu_id, model_def, model_weights, image_resize, labelmap_file):
+        if not cpu_only:
+            caffe.set_device(gpu_id)
+            caffe.set_mode_gpu()
 
         self.image_resize = image_resize
         # Load the net in the test phase for inference, and configure input preprocessing.
@@ -107,11 +108,16 @@ class CaffeDetection:
 
 def main(args):
     '''main '''
-    detection = CaffeDetection(args.gpu_id,
+    detection = CaffeDetection(args.cpu_only, args.gpu_id,
+
                                args.model_def, args.model_weights,
+
                                args.image_resize, args.labelmap_file)
+
     result = detection.detect(args.image_file)
+
     print result
+
 
     img = Image.open(args.image_file)
     draw = ImageDraw.Draw(img)
@@ -133,6 +139,7 @@ def main(args):
 def parse_args():
     '''parse args'''
     parser = argparse.ArgumentParser()
+    parser.add_argument('--cpu_only', type=bool, default=False, help='cpu_only')
     parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
     parser.add_argument('--labelmap_file',
                         default='data/VOC0712/labelmap_voc.prototxt')
