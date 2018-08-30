@@ -1,26 +1,24 @@
 #encoding=utf8
 '''
-Detection with SSD
-In this example, we will load a SSD model and use it to detect objects.
+This script for testing ssd
 '''
 
 import os
-import sys
 import argparse
 import numpy as np
-from PIL import Image, ImageDraw
-# Make sure that caffe is on the python path:
-caffe_root = './'
-os.chdir(caffe_root)
-sys.path.insert(0, os.path.join(caffe_root, 'python'))
+from PIL import Image
+
 import caffe
 
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
 
+# FIXME avoid
 from jinja2 import Environment, PackageLoader
 
 
+# Dump detection result to xml file
+# FIXME Avoid dependencies
 class Writer:
     def __init__(self, folder, filename, database, width, height, depth=3,  segmented=0):
         environment = Environment(loader=PackageLoader('pascal_voc_writer', 'templates'), keep_trailing_newline=True)
@@ -53,7 +51,6 @@ class Writer:
         with open(annotation_path, 'w') as file:
             content = self.annotation_template.render(**self.template_parameters)
             file.write(content)
-
 
 def get_labelname(labelmap, labels):
     num_labels = len(labelmap.item)
@@ -113,11 +110,11 @@ class CaffeDetection:
 
         # Parse the outputs.
         det_label = detections[0,0,:,1]
-        det_conf = detections[0,0,:,2]
-        det_xmin = detections[0,0,:,3]
-        det_ymin = detections[0,0,:,4]
-        det_xmax = detections[0,0,:,5]
-        det_ymax = detections[0,0,:,6]
+        det_conf  = detections[0,0,:,2]
+        det_xmin  = detections[0,0,:,3]
+        det_ymin  = detections[0,0,:,4]
+        det_xmax  = detections[0,0,:,5]
+        det_ymax  = detections[0,0,:,6]
 
         # Get detections with confidence higher than 0.6.
         top_indices = [i for i, conf in enumerate(det_conf) if conf >= conf_thresh]
@@ -145,30 +142,30 @@ class CaffeDetection:
 def main(args):
     '''main '''
     detection = CaffeDetection(args.cpu_only, args.gpu_id,
-
                                args.model_def, args.model_weights,
-
                                args.image_resize, args.labelmap_file)
 
-    other_path, folder = os.path.split(args.dataset_path)
-    database = "The " + folder + " Database"
-    images_path = args.dataset_path + "/JPEGImages"
-    listing = os.listdir(images_path)
-    for img_path in listing:
-        image_file = images_path + "/" + img_path
-        img = Image.open(image_file)
-        result = detection.detect(image_file)
-        width, height = img.size
-        writer = Writer(folder, img_path, database, width, height)
-        for item in result:
+    database_folder = args.dataset_path.split('/')[-1]
+    database_name   = "The " + database_folder + " Database"
+
+    image_paths = args.dataset_path + "/JPEGImages"
+    image_names = os.listdir(image_paths)
+
+    for image_name in image_names:
+        full_image_path = image_paths + "/" + image_name
+        image           = Image.open(full_image_path)
+        detections      = detection.detect(full_image_path)
+        width, height = image.size
+        writer = Writer(database_folder, image_name, database_name, width, height)
+        for item in detections:
             xmin = int(round(item[0] * width))
             ymin = int(round(item[1] * height))
             xmax = int(round(item[2] * width))
             ymax = int(round(item[3] * height))
             writer.addObject(item[-1], xmin, ymin, xmax, ymax)
-        dump_xml = img_path.split('.')[0] + ".xml"
-        writer.save(args.dump_folder + dump_xml)
-        print "create file " + dump_xml
+        dump_file_name = image_name.split('.')[0] + ".xml"
+        writer.save(args.dump_folder + dump_file_name)
+        print "create file " + dump_file_name
 
 def parse_args():
     '''parse args'''
