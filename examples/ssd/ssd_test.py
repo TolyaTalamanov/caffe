@@ -4,6 +4,7 @@ This script for testing ssd
 '''
 
 import os
+from __future__ import division
 import argparse
 import numpy as np
 from PIL import Image
@@ -12,45 +13,6 @@ import caffe
 
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
-
-# FIXME avoid
-from jinja2 import Environment, PackageLoader
-
-
-# Dump detection result to xml file
-# FIXME Avoid dependencies
-class Writer:
-    def __init__(self, folder, filename, database, width, height, depth=3,  segmented=0):
-        environment = Environment(loader=PackageLoader('pascal_voc_writer', 'templates'), keep_trailing_newline=True)
-        self.annotation_template = environment.get_template('annotation.xml')
-
-        self.template_parameters = {
-            'folder': folder,
-            'filename': filename,
-            'database': database,
-            'width': width,
-            'height': height,
-            'depth': depth,
-            'segmented': segmented,
-            'objects': []
-        }
-
-    def addObject(self, name, xmin, ymin, xmax, ymax, pose='Unspecified', truncated=0, difficult=0):
-        self.template_parameters['objects'].append({
-            'name': name,
-            'xmin': xmin,
-            'ymin': ymin,
-            'xmax': xmax,
-            'ymax': ymax,
-            'pose': pose,
-            'truncated': truncated,
-            'difficult': difficult,
-        })
-
-    def save(self, annotation_path):
-        with open(annotation_path, 'w') as file:
-            content = self.annotation_template.render(**self.template_parameters)
-            file.write(content)
 
 def get_labelname(labelmap, labels):
     num_labels = len(labelmap.item)
