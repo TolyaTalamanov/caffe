@@ -2,9 +2,8 @@
 '''
 This script for testing ssd
 '''
-
-import os
 from __future__ import division
+import os
 import argparse
 import numpy as np
 from PIL import Image
@@ -107,34 +106,48 @@ def main(args):
                                args.model_def, args.model_weights,
                                args.image_resize, args.labelmap_file)
 
-    database_folder = args.dataset_path.split('/')[-1]
-    database_name   = "The " + database_folder + " Database"
 
-    image_paths = args.dataset_path + "/JPEGImages"
-    image_names = os.listdir(image_paths)
+    #FIXME Read labels from file
+    labels = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+              'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
+              'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+    
+    dump_dir = args.dump_dir
+    dump_files = {}
 
-    for image_name in image_names:
-        full_image_path = image_paths + "/" + image_name
-        image           = Image.open(full_image_path)
-        detections      = detection.detect(full_image_path)
+    name_prefix = 'comp4_det_test_'
+    for label in labels:
+        file_name = name_prefix + label + '.txt'
+        dump_files[label] = open(os.path.join(dump_dir, file_name), 'w+')
+
+    images_dir = args.images_dir
+    image_name_list = os.listdir(images_dir)
+    
+    for image_name in image_name_list:
+        image_path = os.path.join(images_dir, image_name)
+        image = Image.open(image_path)
+
+        detections = detection.detect(image_path)
+
         width, height = image.size
-        writer = Writer(database_folder, image_name, database_name, width, height)
         for item in detections:
+            # item[-1] - label, item[-2] score
             xmin = int(round(item[0] * width))
             ymin = int(round(item[1] * height))
             xmax = int(round(item[2] * width))
             ymax = int(round(item[3] * height))
-            writer.addObject(item[-1], xmin, ymin, xmax, ymax)
-        dump_file_name = image_name.split('.')[0] + ".xml"
-        writer.save(args.dump_folder + dump_file_name)
-        print "create file " + dump_file_name
+            #FIXME I hate line below, refactor this later
+            result_line = image_name.split('.')[0] + ' ' + str(item[-2]) + ' ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + '\n'
+            dump_files[item[-1]].write(result_line)
+    print 'Test finish'
 
 def parse_args():
     '''parse args'''
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dump_dir', help='dump_dir')
     parser.add_argument('--cpu_only', type=bool, default=False, help='cpu_only')
-    parser.add_argument('--dataset_path', help='dataset_path')
-    parser.add_argument('--dump_folder', help='dump_folder')
+    parser.add_argument('--images_dir', help='images_dir')
+    # parser.add_argument('--dump_folder', help='dump_folder')
     parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
     parser.add_argument('--labelmap_file',
                         default='data/VOC0712/labelmap_voc.prototxt')
@@ -144,7 +157,6 @@ def parse_args():
     parser.add_argument('--model_weights',
                         default='models/VGGNet/VOC0712/SSD_300x300/'
                         'VGG_VOC0712_SSD_300x300_iter_120000.caffemodel')
-    parser.add_argument('--image_file', default='examples/images/fish-bike.jpg')
     return parser.parse_args()
 
 if __name__ == '__main__':
