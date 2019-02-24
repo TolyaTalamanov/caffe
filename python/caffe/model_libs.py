@@ -549,6 +549,42 @@ def ResNet152Body(net, from_layer, use_pool5=True, use_dilation_conv5=False, **b
 
     return net
 
+def ResNet50Body(net, from_layer, **bn_param):
+    conv_prefix = ''
+    conv_postfix = ''
+    bn_prefix = 'bn_'
+    bn_postfix = ''
+    scale_prefix = 'scale_'
+    scale_postfix = ''
+    ConvBNLayer(net, from_layer, 'conv1', use_bn=True, use_relu=True,
+        num_output=64, kernel_size=7, pad=3, stride=2,
+        conv_prefix=conv_prefix, conv_postfix=conv_postfix,
+        bn_prefix=bn_prefix, bn_postfix=bn_postfix,
+        scale_prefix=scale_prefix, scale_postfix=scale_postfix, **bn_param)
+
+    net.pool1 = L.Pooling(net.conv1, pool=P.Pooling.MAX, kernel_size=3, stride=2)
+
+    ResBody(net, 'pool1', '2a', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=True, **bn_param)
+    ResBody(net, 'res2a', '2b', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=False, **bn_param)
+    ResBody(net, 'res2b', '2c', out2a=64, out2b=64, out2c=256, stride=1, use_branch1=False, **bn_param)
+
+    ResBody(net, 'res2c', '3a', out2a=128, out2b=128, out2c=512, stride=2, use_branch1=True, **bn_param)
+    ResBody(net, 'res3a', '3b', out2a=128, out2b=128, out2c=512, stride=1, use_branch1=False, **bn_param)
+    ResBody(net, 'res3b', '3c', out2a=128, out2b=128, out2c=512, stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res3c', '3d', out2a=128, out2b=128, out2c=512, stride=1, use_branch1=False, **bn_param)
+
+    ResBody(netb 'res3d', '4a', out2a=256, out2b=256, out2c=1024,stride=2, use_branch1=True, **bn_param)
+    ResBody(netb 'res4a', '4b', out2a=256, out2b=256, out2c=1024,stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res4b', '4c', out2a=256, out2b=256, out2c=1024,stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res4c', '4d', out2a=256, out2b=256, out2c=1024,stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res4d', '4e', out2a=256, out2b=256, out2c=1024,stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res4e', '4f', out2a=256, out2b=256, out2c=1024,stride=1, use_branch1=False, **bn_param)
+
+    ResBody(netb 'res4f', '5a', out2a=512, out2b=512, out2c=2048,stride=2, use_branch1=True, **bn_param)
+    ResBody(netb 'res5a', '5b', out2a=512, out2b=512, out2c=2048,stride=1, use_branch1=False, **bn_param)
+    ResBody(netb 'res5b', '5c', out2a=512, out2b=512, out2c=2048,stride=1, use_branch1=False, **bn_param)
+
+    return net
 
 def InceptionV3Body(net, from_layer, output_pred=False, **bn_param):
   # scale is fixed to 1, thus we ignore it.
