@@ -107,18 +107,11 @@ def main(args):
                                args.image_resize, args.labelmap_file)
 
 
-    #FIXME Read labels from file
-    labels = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
-              'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
-              'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
-    
+    classes = open(args.classes).read().split()
+    class_dict = {}
     dump_dir = args.dump_dir
-    dump_files = {}
-
-    name_prefix = 'comp4_det_test_'
-    for label in labels:
-        file_name = name_prefix + label + '.txt'
-        dump_files[label] = open(os.path.join(dump_dir, file_name), 'w+')
+    for class_name in classes:
+        class_dict[class_name] = open(os.path.join(dump_dir, 'dt_' + class_name + '.txt'), 'w')
 
     images_dir = args.images_dir
     image_name_list = os.listdir(images_dir)
@@ -136,16 +129,16 @@ def main(args):
             ymin = int(round(item[1] * height))
             xmax = int(round(item[2] * width))
             ymax = int(round(item[3] * height))
-            result_line = ' '.join()
             #FIXME I hate line below, refactor this later
             result_line = image_name.split('.')[0] + ' ' + str(item[-2]) + ' ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + '\n'
-            dump_files[item[-1]].write(result_line)
+            class_dict[item[-1]].write(result_line)
 
 def parse_args():
     '''parse args'''
     parser = argparse.ArgumentParser()
     parser.add_argument('--dump_dir', help='dump_dir')
     parser.add_argument('--cpu_only', type=bool, default=False, help='cpu_only')
+    parser.add_argument('--classes', help = 'classes')
     parser.add_argument('--images_dir', help='images_dir')
     parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
     parser.add_argument('--labelmap_file',
